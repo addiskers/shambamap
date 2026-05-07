@@ -1,0 +1,21 @@
+services:
+  shambamap-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: shambamap-backend
+    env_file: ./backend/.env
+    ports:
+      - "127.0.0.1:8002:8000"
+    restart: unless-stopped
+
+  shambamap-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: shambamap-frontend
+    ports:
+      - "127.0.0.1:3002:80"
+    depends_on:
+      - shambamap-backend
+    restart: unless-stopped
