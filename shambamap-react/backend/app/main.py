@@ -4,11 +4,11 @@ from app.routers import voice
 
 settings = get_settings()
 
-app = FastAPI(title="ShambaMap Voice API")
+app = FastAPI(title="AgriMap Voice API")
 
 app.include_router(voice.router)
 
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "app": "ShambaMap Voice API"}
+    return {"status": "ok", "app": "AgriMap Voice API"}

@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { KENYA_GEO, KAMIS_PRICES, NDMA_PHASE, KEPHIS_VARIETIES, EXTRA_VARIETIES, D, REAL, VARIETIES, SCHEMES, BLOCKS, FARMER_VOICES, KIAMIS, BETA, FOODSEC, EUDR, DAIRY, DVS, EXPORTS, COLDCHAIN, MECH, NCPB, PHYTO, DFZ, FLAGSHIP, AGRA, DEALERS, CPI, HUSTLER, GFW, SOILACID, CROPFIT, IOVSOC, TEA_AUCTION, COFFEE_AUCTION, VCI, SPI, PEST_WATCH, getDistCoords } from './data/index.js'
+import StressTester from './pages/StressTester'
+import CascadenceFlow from './pages/CascadenceFlow'
+import InvestmentTracker from './pages/InvestmentTracker'
+import PolicyUpdates from './pages/PolicyUpdates'
 
 // Tile URLs
 const DARK_URL='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
@@ -354,7 +358,7 @@ function getCol(d){
   if(mod==='vci'){var v=VCI[d.id];if(!v)return'#94a3b8';return v.vci<35?'#dc2626':v.vci<50?'#f59e0b':v.vci<65?'#06b6d4':'#10b981'}
   if(mod==='spi'){var sp=SPI[d.id];if(!sp)return'#94a3b8';return sp.spi_12<-1.5?'#dc2626':sp.spi_12<-1?'#f59e0b':sp.spi_12<1?'#10b981':sp.spi_12<1.5?'#06b6d4':'#0ea5e9'}
   if(mod==='acid'){var sa=SOILACID[d.id];if(!sa)return'#94a3b8';return sa.severity==='Severe'?'#dc2626':sa.severity==='Moderate'?'#f59e0b':sa.severity==='Mild'?'#06b6d4':'#10b981'}
-  if(mod==='cropfit'){var cf=CROPFIT[d.id];if(!cf)return'#94a3b8';var crops=Object.keys(cf);if(!crops.length)return'#94a3b8';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});var top=cf[crops[0]].fit;return top>=90?'#10b981':top>=75?'#06b6d4':top>=50?'#f59e0b':'#dc2626'}
+  if(mod==='cropfit'){var cf=CROPFIT[d.id];if(!cf)return'#94a3b8';var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(!crops.length)return'#94a3b8';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});var top=cf[crops[0]].fit;return top>=90?'#10b981':top>=75?'#06b6d4':top>=50?'#f59e0b':'#dc2626'}
   if(mod==='tea'){var t=TEA_AUCTION[d.id];if(!t)return'#94a3b8';return t.bp1_avg>=300?'#10b981':t.bp1_avg>=250?'#06b6d4':t.bp1_avg>=200?'#f59e0b':'#dc2626'}
   if(mod==='coffee'){var cof=COFFEE_AUCTION[d.id];if(!cof)return'#94a3b8';return cof.aa_kshbag>=70000?'#10b981':cof.aa_kshbag>=60000?'#06b6d4':cof.aa_kshbag>=50000?'#f59e0b':'#dc2626'}
   if(mod==='pestwatch'){var pw=PEST_WATCH[d.id];if(!pw)return'#94a3b8';var maxR=Math.max(pw.locust_risk||0,pw.faw_pressure||0);return maxR>=4?'#dc2626':maxR>=3?'#f59e0b':maxR>=2?'#06b6d4':'#10b981'}
@@ -373,9 +377,9 @@ function getCol(d){
   if(mod==='dfz'){var df=DFZ[d.id];if(!df||df.status==='none')return'#475569';return df.status==='compartment'?'#10b981':df.status==='demarcated'?'#06b6d4':df.status==='proposed'?'#f59e0b':'#94a3b8'}
   if(mod==='flagship'){var fl=FLAGSHIP[d.id];if(!fl)return'#94a3b8';return fl.investment_kshB>=5?'#10b981':fl.investment_kshB>=2?'#06b6d4':fl.investment_kshB>=1?'#f59e0b':'#475569'}
   if(mod==='seedsys')return srrCol(d.srr[c]);
-  if(mod==='smartcrop'){var cf=CROPFIT[d.id];if(!cf)return'#94a3b8';var crops=Object.keys(cf);if(!crops.length)return'#94a3b8';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});var top=cf[crops[0]].fit;return top>=85?'#10b981':top>=70?'#06b6d4':top>=55?'#f59e0b':'#dc2626'}
+  if(mod==='smartcrop'){var cf=CROPFIT[d.id];if(!cf)return'#94a3b8';var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(!crops.length)return'#94a3b8';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});var top=cf[crops[0]].fit;return top>=85?'#10b981':top>=70?'#06b6d4':top>=55?'#f59e0b':'#dc2626'}
   if(mod==='iovsoc'){var io=IOVSOC[d.id];if(!io)return'#94a3b8';var roi=io.yield_tHa*io.price_kshT/io.input_kshHa;return roi>=2.5?'#10b981':roi>=1.8?'#06b6d4':roi>=1.2?'#f59e0b':'#dc2626'}
-  if(mod==='varrec'){var cf=CROPFIT[d.id];if(!cf)return'#94a3b8';var crops=Object.keys(cf);if(!crops.length)return'#94a3b8';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return cf[crops[0]].fit>=85?'#10b981':cf[crops[0]].fit>=70?'#06b6d4':cf[crops[0]].fit>=55?'#f59e0b':'#dc2626'}
+  if(mod==='varrec'){var cf=CROPFIT[d.id];if(!cf)return'#94a3b8';var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(!crops.length)return'#94a3b8';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return cf[crops[0]].fit>=85?'#10b981':cf[crops[0]].fit>=70?'#06b6d4':cf[crops[0]].fit>=55?'#f59e0b':'#dc2626'}
   if(mod==='planrec'){var io=IOVSOC[d.id];if(!io)return'#94a3b8';var roi=io.yield_tHa*io.price_kshT/io.input_kshHa;return roi>=2.5?'#10b981':roi>=1.8?'#06b6d4':roi>=1.2?'#f59e0b':'#dc2626'}
   return srrCol(d.srr[c]);
 }
@@ -404,7 +408,7 @@ function getLabel(d){
   if(mod==='vci'){var v=VCI[d.id];return v?v.vci+'':'—'}
   if(mod==='spi'){var sp=SPI[d.id];return sp?(sp.spi_12>=0?'+':'')+sp.spi_12.toFixed(1):'—'}
   if(mod==='acid'){var sa=SOILACID[d.id];return sa?sa.acid_arable_pct+'%':'—'}
-  if(mod==='cropfit'){var cf=CROPFIT[d.id];if(!cf)return'—';var crops=Object.keys(cf);if(!crops.length)return'—';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return cf[crops[0]].fit+''}
+  if(mod==='cropfit'){var cf=CROPFIT[d.id];if(!cf)return'—';var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(!crops.length)return'—';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return cf[crops[0]].fit+''}
   if(mod==='tea'){var t=TEA_AUCTION[d.id];return t?'USC'+t.bp1_avg:'—'}
   if(mod==='coffee'){var cof=COFFEE_AUCTION[d.id];return cof?'KSh'+(cof.aa_kshbag/1000).toFixed(0)+'k':'—'}
   if(mod==='pestwatch'){var pw=PEST_WATCH[d.id];if(!pw)return'—';return pw.faw_pressure>=4?'⚠ FAW':pw.faw_pressure>=3?'FAW '+pw.faw_pressure:'✓'}
@@ -423,9 +427,9 @@ function getLabel(d){
   if(mod==='dfz'){var df=DFZ[d.id];return df&&df.status!=='none'?df.progress+'%':'—'}
   if(mod==='flagship'){var fl=FLAGSHIP[d.id];return fl?'KSh'+fl.investment_kshB.toFixed(1)+'B':'—'}
   if(mod==='seedsys')return d.srr[c]+'%';
-  if(mod==='smartcrop'){var cf=CROPFIT[d.id];if(!cf)return'—';var crops=Object.keys(cf);if(!crops.length)return'—';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return crops[0].slice(0,4)}
+  if(mod==='smartcrop'){var cf=CROPFIT[d.id];if(!cf)return'—';var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(!crops.length)return'—';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return crops[0].slice(0,4)}
   if(mod==='iovsoc'){var io=IOVSOC[d.id];if(!io)return'—';var roi=io.yield_tHa*io.price_kshT/io.input_kshHa;return roi.toFixed(1)+'x'}
-  if(mod==='varrec'){var cf=CROPFIT[d.id];if(!cf)return'—';var crops=Object.keys(cf);if(!crops.length)return'—';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return crops[0].slice(0,4)}
+  if(mod==='varrec'){var cf=CROPFIT[d.id];if(!cf)return'—';var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(!crops.length)return'—';crops.sort(function(a,b){return cf[b].fit-cf[a].fit});return crops[0].slice(0,4)}
   if(mod==='planrec'){var io=IOVSOC[d.id];if(!io)return'—';return 'KSh'+Math.round(io.yield_tHa*io.price_kshT/1000)+'k'}
   return d.srr[c]+'%';
 }
@@ -564,7 +568,7 @@ function renderDash(){
   else if(mod==='vci'){var avgVci=Math.round(Object.values(VCI).reduce(function(s,v){return s+v.vci},0)/Object.keys(VCI).length);var droughtN=Object.values(VCI).filter(function(v){return v.vci<35}).length;h='<div class="dk"><div class="dv" style="color:'+(avgVci<35?'var(--rd)':avgVci<50?'var(--or)':'var(--gn)')+'">'+avgVci+'</div><div class="dl">Avg VCI</div></div><div class="dk"><div class="dv" style="color:var(--rd)">'+droughtN+'</div><div class="dl">Severe drought</div></div><div class="dk"><div class="dv" style="color:var(--cy)">Dekadal</div><div class="dl">BOKU/FEWS NET</div></div>'}
   else if(mod==='spi'){var avgSpi=(Object.values(SPI).reduce(function(s,sp){return s+sp.spi_12},0)/Object.keys(SPI).length).toFixed(1);var dryN=Object.values(SPI).filter(function(sp){return sp.spi_12<-1}).length;h='<div class="dk"><div class="dv" style="color:'+(avgSpi<-1?'var(--rd)':avgSpi<0?'var(--or)':'var(--gn)')+'">'+(avgSpi>=0?'+':'')+avgSpi+'</div><div class="dl">Avg SPI-12</div></div><div class="dk"><div class="dv" style="color:var(--rd)">'+dryN+'</div><div class="dl">Counties dry</div></div><div class="dk"><div class="dv" style="color:var(--cy)">CHIRPS</div><div class="dl">WMO standard</div></div>'}
   else if(mod==='acid'){var avgAcid=Math.round(Object.values(SOILACID).reduce(function(s,v){return s+v.acid_arable_pct},0)/Object.keys(SOILACID).length);var sev=Object.values(SOILACID).filter(function(v){return v.severity==='Severe'}).length;h='<div class="dk"><div class="dv" style="color:var(--rd)">'+avgAcid+'%</div><div class="dl">Avg acidic land</div></div><div class="dk"><div class="dv" style="color:var(--rd)">'+sev+'</div><div class="dl">Severe counties</div></div><div class="dk"><div class="dv" style="color:var(--cy)">63%</div><div class="dl">National (KALRO 2023)</div></div>'}
-  else if(mod==='cropfit'){var goodFitN=0,topFitTotal=0;Object.values(CROPFIT).forEach(function(cf){var crops=Object.keys(cf);if(crops.length){crops.sort(function(a,b){return cf[b].fit-cf[a].fit});topFitTotal+=cf[crops[0]].fit;if(cf[crops[0]].fit>=90)goodFitN++}});var avgTop=Math.round(topFitTotal/Object.keys(CROPFIT).length);h='<div class="dk"><div class="dv" style="color:'+(avgTop>=80?'var(--gn)':'var(--or)')+'">'+avgTop+'</div><div class="dl">Avg top-crop fit</div></div><div class="dk"><div class="dv" style="color:var(--gn)">'+goodFitN+'</div><div class="dl">Counties &ge;90 fit</div></div><div class="dk"><div class="dv" style="color:var(--cy)">GAEZ v4</div><div class="dl">FAO/IIASA</div></div>'}
+  else if(mod==='cropfit'){var goodFitN=0,topFitTotal=0;Object.values(CROPFIT).forEach(function(cf){var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(crops.length){crops.sort(function(a,b){return cf[b].fit-cf[a].fit});topFitTotal+=cf[crops[0]].fit;if(cf[crops[0]].fit>=90)goodFitN++}});var avgTop=Math.round(topFitTotal/Object.keys(CROPFIT).length);h='<div class="dk"><div class="dv" style="color:'+(avgTop>=80?'var(--gn)':'var(--or)')+'">'+avgTop+'</div><div class="dl">Avg top-crop fit</div></div><div class="dk"><div class="dv" style="color:var(--gn)">'+goodFitN+'</div><div class="dl">Counties &ge;90 fit</div></div><div class="dk"><div class="dv" style="color:var(--cy)">GAEZ v4</div><div class="dl">FAO/IIASA</div></div>'}
   else if(mod==='tea'){var totKg=0,avgBp1=0;Object.values(TEA_AUCTION).forEach(function(t){totKg+=t.weekly_kg;avgBp1+=t.bp1_avg});var n=Object.keys(TEA_AUCTION).length;h='<div class="dk"><div class="dv" style="color:var(--gn)">USC '+Math.round(avgBp1/n)+'</div><div class="dl">Avg BP1 price</div></div><div class="dk"><div class="dv" style="color:var(--cy)">'+(totKg/1e6).toFixed(1)+'M kg</div><div class="dl">Weekly volume</div></div><div class="dk"><div class="dv" style="color:var(--or)">'+n+'</div><div class="dl">Producing counties</div></div>'}
   else if(mod==='coffee'){var totBags=0,avgAA=0;Object.values(COFFEE_AUCTION).forEach(function(c2){totBags+=c2.weekly_bags;avgAA+=c2.aa_kshbag});var n=Object.keys(COFFEE_AUCTION).length;h='<div class="dk"><div class="dv" style="color:var(--gn)">KSh '+(Math.round(avgAA/n/1000))+'k</div><div class="dl">Avg AA/50kg</div></div><div class="dk"><div class="dv" style="color:var(--or)">'+totBags.toLocaleString()+'</div><div class="dl">Weekly bags</div></div><div class="dk"><div class="dv" style="color:var(--rd)">EUDR</div><div class="dl">Dec 2026 deadline</div></div>'}
   else if(mod==='pestwatch'){var fawHigh=Object.values(PEST_WATCH).filter(function(p){return p.faw_pressure>=4}).length;var totalAlerts=Object.values(PEST_WATCH).reduce(function(s,p){return s+(p.alerts_week||0)},0);h='<div class="dk"><div class="dv" style="color:var(--rd)">'+fawHigh+'</div><div class="dl">High FAW counties</div></div><div class="dk"><div class="dv" style="color:var(--or)">'+totalAlerts+'</div><div class="dl">Alerts this week</div></div><div class="dk"><div class="dv" style="color:var(--gn)">Calm</div><div class="dl">Locust status</div></div>'}
@@ -583,7 +587,7 @@ function renderDash(){
   else if(mod==='dfz'){var compart=Object.values(DFZ).filter(function(d2){return d2.status==='compartment'}).length;var avgProg=Math.round(Object.values(DFZ).filter(function(d2){return d2.status!=='none'}).reduce(function(s,d2){return s+d2.progress},0)/Math.max(1,Object.values(DFZ).filter(function(d2){return d2.status!=='none'}).length));h='<div class="dk"><div class="dv" style="color:var(--gn)">'+compart+'</div><div class="dl">Compartments</div></div><div class="dk"><div class="dv" style="color:var(--cy)">'+avgProg+'%</div><div class="dl">Avg progress</div></div><div class="dk"><div class="dv" style="color:var(--or)">2027</div><div class="dl">Target year</div></div>'}
   else if(mod==='flagship'){var totInv=Object.values(FLAGSHIP).reduce(function(s,f){return s+(f.investment_kshB||0)},0);var nProj=Object.values(FLAGSHIP).filter(function(f){return f.projects&&f.projects.length>0}).length;h='<div class="dk"><div class="dv" style="color:var(--gn)">KSh '+totInv.toFixed(1)+'B</div><div class="dl">Total investment</div></div><div class="dk"><div class="dv" style="color:var(--cy)">'+nProj+'</div><div class="dl">Counties w/ projects</div></div><div class="dk"><div class="dv" style="color:var(--bl)">BETA</div><div class="dl">Flagship tracker</div></div>'}
   else if(mod==='seedsys')h='<div class="dk"><div class="dv" style="color:var(--gn)">'+avgHAR+'%</div><div class="dl">Avg HAR ('+cn+')</div></div><div class="dk"><div class="dv" style="color:var(--or)">'+critical+'</div><div class="dl">Critical &lt;20%</div></div><div class="dk"><div class="dv" style="color:var(--cy)">KEPHIS</div><div class="dl">+ Tegemeo</div></div>';
-  else if(mod==='smartcrop'){var nGoodFit=0,topCounts={};Object.keys(CROPFIT).forEach(function(cid){var cf=CROPFIT[cid];var crops=Object.keys(cf);if(crops.length){crops.sort(function(a,b){return cf[b].fit-cf[a].fit});var t=crops[0];topCounts[t]=(topCounts[t]||0)+1;if(cf[t].fit>=85)nGoodFit++}});var topCrop='',topN=0;Object.keys(topCounts).forEach(function(k){if(topCounts[k]>topN){topN=topCounts[k];topCrop=k}});h='<div class="dk"><div class="dv" style="color:var(--gn)">'+nGoodFit+'</div><div class="dl">Counties &ge;85 fit</div></div><div class="dk"><div class="dv" style="color:var(--cy)">'+topCrop+'</div><div class="dl">Most-recommended crop</div></div><div class="dk"><div class="dv" style="color:var(--or)">GAEZ v4</div><div class="dl">+ market + climate</div></div>'}
+  else if(mod==='smartcrop'){var nGoodFit=0,topCounts={};Object.keys(CROPFIT).forEach(function(cid){var cf=CROPFIT[cid];var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});if(crops.length){crops.sort(function(a,b){return cf[b].fit-cf[a].fit});var t=crops[0];topCounts[t]=(topCounts[t]||0)+1;if(cf[t].fit>=85)nGoodFit++}});var topCrop='',topN=0;Object.keys(topCounts).forEach(function(k){if(topCounts[k]>topN){topN=topCounts[k];topCrop=k}});h='<div class="dk"><div class="dv" style="color:var(--gn)">'+nGoodFit+'</div><div class="dl">Counties &ge;85 fit</div></div><div class="dk"><div class="dv" style="color:var(--cy)">'+topCrop+'</div><div class="dl">Most-recommended crop</div></div><div class="dk"><div class="dv" style="color:var(--or)">GAEZ v4</div><div class="dl">+ market + climate</div></div>'}
   else if(mod==='iovsoc'){var totSubsidy=0,totRoi=0,nC=0,goodRoi=0;Object.values(IOVSOC).forEach(function(io){totSubsidy+=io.subsidy_kshM_yr;var roi=io.yield_tHa*io.price_kshT/io.input_kshHa;totRoi+=roi;nC++;if(roi>=2.0)goodRoi++});var avgRoi=(totRoi/nC).toFixed(1);h='<div class="dk"><div class="dv" style="color:var(--bl)">KSh '+(totSubsidy/1000).toFixed(1)+'B</div><div class="dl">Total subsidy/yr</div></div><div class="dk"><div class="dv" style="color:'+(avgRoi>=2?'var(--gn)':'var(--or)')+'">'+avgRoi+'x</div><div class="dl">Avg ROI</div></div><div class="dk"><div class="dv" style="color:var(--gn)">'+goodRoi+'</div><div class="dl">Counties ROI &ge;2x</div></div>'}
   else if(mod==='varrec'){var totVar=0;Object.keys(KEPHIS_VARIETIES).forEach(function(k){totVar+=KEPHIS_VARIETIES[k].length});Object.keys(EXTRA_VARIETIES).forEach(function(k){totVar+=EXTRA_VARIETIES[k].length});h='<div class="dk"><div class="dv" style="color:var(--gn)">'+totVar+'</div><div class="dl">Varieties indexed</div></div><div class="dk"><div class="dv" style="color:var(--cy)">KEPHIS</div><div class="dl">+ KALRO + EXTRA</div></div><div class="dk"><div class="dv" style="color:var(--or)">1393</div><div class="dl">SMS verify</div></div>'}
   else if(mod==='planrec'){var totROI=0,n=0,bestC='',bestR=0;Object.entries(IOVSOC).forEach(function(e){var io=e[1];var r=io.yield_tHa*io.price_kshT/io.input_kshHa;totROI+=r;n++;if(r>bestR){bestR=r;bestC=e[0]}});h='<div class="dk"><div class="dv" style="color:var(--gn)">'+(totROI/n).toFixed(1)+'x</div><div class="dl">Avg ROI plan</div></div><div class="dk"><div class="dv" style="color:var(--cy)">'+bestC.slice(0,8)+'</div><div class="dl">Top ROI county</div></div><div class="dk"><div class="dv" style="color:var(--or)">Pula</div><div class="dl">Insurance partner</div></div>'}
@@ -1098,7 +1102,7 @@ function renderDetail(){
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Personalized advisory for '+d.n+' farmers via WhatsApp in Swahili</div>';
     var recs2=getRecommendations(d.id);var topRec=recs2.length>0?recs2[0].variety:null;
     html+='<div style="padding:8px;background:#e8f5e9;border-radius:8px;border:1px solid #c8e6c9;margin-bottom:6px;font-size:10px;line-height:1.6">';
-    html+='<div style="font-size:8px;color:#25d366;font-weight:700;margin-bottom:4px">🌱 ShambaMap Kenya — '+d.n+'</div>';
+    html+='<div style="font-size:8px;color:#25d366;font-weight:700;margin-bottom:4px">🌱 AgriMap Kenya — '+d.n+'</div>';
     html+='<b>🌾 '+cn+' Hybrid Adoption:</b> '+d.srr[c]+'%<br>';
     if(topRec)html+='<b>✅ Pendekezo:</b> '+topRec.name+' — '+topRec.yield.avg+' kg/ha — '+topRec.traits[0]+'<br>';
     html+='<b>🌤 Hali ya hewa:</b> '+simWeather(d.id).temp_max+'°C, '+simWeather(d.id).rain_7d+'mm mvua/7d<br>';
@@ -1116,7 +1120,7 @@ function renderDetail(){
     html+='<div style="margin-top:6px"><div class="sh">Programmes Zinazopatikana — '+d.n+'</div>';
     farmerSchemes.forEach(function(fs){html+='<div style="padding:5px 6px;background:var(--bg);border-radius:5px;margin-bottom:2px;border:1px solid var(--bd);font-size:10px;display:flex;align-items:center;gap:5px"><span style="font-size:14px">'+fs.icon+'</span><div style="flex:1"><div style="font-weight:700">'+fs.name+'</div><div style="font-size:8px;color:var(--gn)">'+fs.benefit+'</div></div><span style="font-size:7px;padding:2px 5px;border-radius:3px;background:rgba(16,185,129,.1);color:var(--gn);font-weight:700">'+fs.status.toUpperCase()+'</span></div>'});
     html+='</div>';
-    html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Delivery: WhatsApp Bot (@ShambaMapKE) + USSD *741# + sub-county extension SMS</div></div>';
+    html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Delivery: WhatsApp Bot (@AgriMapKE) + USSD *741# + sub-county extension SMS</div></div>';
     html+='<div style="margin-top:6px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: On-demand</div>';
 
 
@@ -1605,7 +1609,7 @@ function renderDetail(){
 
   } else if(mod==='cropfit'){
     var cf=CROPFIT[d.id]||{};
-    var crops=Object.keys(cf);
+    var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});
     if(crops.length===0){
       html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(34,197,94,.15)">🎯</div><h3>Crop Fit Intelligence — '+d.n+'<span class="cad-badge cad-MONTHLY" title="KAMIS Ministry of Agriculture">Monthly</span></h3></div>';
       html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px">No crop fit data available for this county.</div></div>';
@@ -1827,7 +1831,7 @@ function renderDetail(){
     var ex=EXPORTS[d.id]||{};
     html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(34,197,94,.15)">🌱</div><h3>Crop Recommendation — '+d.n+'<span class="cad-badge cad-REF" title="Synthesis of GAEZ + climate + market + regulatory + soil + input access">Computed</span></h3></div>';
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Decision-support synthesis: GAEZ v4 + iSDAsoil + SPI rainfall + VCI vegetation + KAMIS market + EUDR + buyer presence + dealer access. Indicative — final decisions need extension officer + farmer context.</div>';
-    var crops=Object.keys(cf);
+    var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});
     if(!crops.length){
       html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">No crop-fit data for '+d.n+'. Available for 25 priority counties.</div>';
     } else {
@@ -1999,7 +2003,7 @@ function renderDetail(){
     var ss=d.seed||{};
     html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(34,197,94,.15)">🌾</div><h3>Seed Variety Pick — '+d.n+'<span class="cad-badge cad-ANNUAL" title="KEPHIS Variety Register + KALRO release records">Annual</span></h3></div>';
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Variety-level recommendations: KEPHIS Variety Register + KALRO release records + climate matching + variety age check + counterfeit risk. Confirm with extension officer + KALRO contact before scaling.</div>';
-    var crops=Object.keys(cf);
+    var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});
     if(!crops.length){
       html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">No crop-fit data for '+d.n+'.</div>';
     } else {
@@ -2477,9 +2481,9 @@ function seedPanel(d,r,c){
 
 // ══════ AI CHATBOT ══════
 function toggleAI(){var p=document.getElementById('aiPanel');p.style.display=p.style.display==='none'?'block':'none';
-if(p.style.display==='block'&&document.getElementById('aiMessages').innerHTML===''){addAIMsg('bot','🤖 Karibu! Welcome to ShambaMap Kenya AI.\n\nAsk me:\n• "Why is Kitui hybrid adoption so low?"\n• "Best maize variety for Trans Nzoia?"\n• "Long Rains 2026 readiness plan"\n• Question yoyote kwa Swahili au English!')}}
+if(p.style.display==='block'&&document.getElementById('aiMessages').innerHTML===''){addAIMsg('bot','🤖 Karibu! Welcome to AgriMap Kenya AI.\n\nAsk me:\n• "Why is Kitui hybrid adoption so low?"\n• "Best maize variety for Trans Nzoia?"\n• "Long Rains 2026 readiness plan"\n• Question yoyote kwa Swahili au English!')}}
 function addAIMsg(who,text){var div=document.getElementById('aiMessages');var bg=who==='bot'?'var(--s2)':'rgba(16,185,129,.15)';var align=who==='bot'?'margin-right:24px':'margin-left:24px';div.innerHTML+='<div style="padding:6px 8px;background:'+bg+';border-radius:6px;margin-bottom:4px;'+align+';font-size:10px;line-height:1.5;color:var(--tx)">'+text.replace(/\n/g,'<br>')+'</div>';div.scrollTop=div.scrollHeight}
-function askAI(){var inp=document.getElementById('aiInput');var q=inp.value.trim();if(!q)return;addAIMsg('user',q);inp.value='';setTimeout(function(){var c=window.__shambamap_crop;var cn={maize:'Mahindi',wheat:'Ngano',beans:'Maharagwe',sorghum:'Mtama'}[c];var resp='🤖 ShambaMap AI:\n\nKenya '+cn+' analysis across 25 counties. Average hybrid adoption: '+Math.round(D.reduce(function(s,d){return s+d.srr[c]},0)/D.length)+'%.\n\nPriority recommendation: Increase certified seed distribution in Kitui, Kwale, Kilifi, and Makueni — ASAL counties with critically low hybrid adoption.\n\nUliza kuhusu kaunti maalum kwa ushauri wa kina!';addAIMsg('bot',resp)},800)}
+function askAI(){var inp=document.getElementById('aiInput');var q=inp.value.trim();if(!q)return;addAIMsg('user',q);inp.value='';setTimeout(function(){var c=window.__shambamap_crop;var cn={maize:'Mahindi',wheat:'Ngano',beans:'Maharagwe',sorghum:'Mtama'}[c];var resp='🤖 AgriMap AI:\n\nKenya '+cn+' analysis across 25 counties. Average hybrid adoption: '+Math.round(D.reduce(function(s,d){return s+d.srr[c]},0)/D.length)+'%.\n\nPriority recommendation: Increase certified seed distribution in Kitui, Kwale, Kilifi, and Makueni — ASAL counties with critically low hybrid adoption.\n\nUliza kuhusu kaunti maalum kwa ushauri wa kina!';addAIMsg('bot',resp)},800)}
 
 // ══════ AUTH SYSTEM ══════
 var ROLES={
@@ -2496,7 +2500,8 @@ var ROLES={
   ward:{name:'Ward Agri Officer',abbr:'WAO',color:'#f59e0b',bg:'rgba(245,158,11,.1)',modules:['cropfit','seed','weather','pest','fertilizer','officer','sowing','earlywarning','monsoon'],desc:'Ward-level operations'},
   kalro_r:{name:'KALRO Researcher',abbr:'RES',color:'#06b6d4',bg:'rgba(6,182,212,.1)',modules:['cropfit','seed','ndvi','pest','fertilizer','horti','sowing','earlywarning','benchmark'],desc:'Research & advisory'},
   coop:{name:'SACCO / Cooperative',abbr:'COP',color:'#ec4899',bg:'rgba(236,72,153,.1)',modules:['cropfit','seed','weather','pest','market','sowing'],desc:'Farmer SACCOs'},
-  farmer:{name:'Mkulima / Farmer',abbr:'🌱',color:'#84cc16',bg:'rgba(132,204,22,.1)',modules:['cropfit','mkulima','seed','weather','pest','fertilizer','market','sowing','pestcam','seedqr'],desc:'Personal farm advisory'}
+  farmer:{name:'Mkulima / Farmer',abbr:'🌱',color:'#84cc16',bg:'rgba(132,204,22,.1)',modules:['cropfit','mkulima','seed','weather','pest','fertilizer','market','sowing','pestcam','seedqr'],desc:'Personal farm advisory'},
+  foundation:{name:'Foundation',abbr:'FN',color:'#f59e0b',bg:'rgba(245,158,11,.1)',modules:[],desc:'Strategy, investment & policy dashboards',pages:['stress','cascade','invest','policy']}
 };
 var currentUser=null;var selectedRole='cs';
 
@@ -2598,6 +2603,7 @@ export default function App() {
   const [aiInput, setAiInput] = useState('')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [dark, setDark] = useState(false)
+  const [activePage, setActivePage] = useState('map')
   const [rightHTML, setRightHTML] = useState('')
   const [rightVisible, setRightVisible] = useState(false)
   const [dashHTML, setDashHTML] = useState('')
@@ -2632,7 +2638,7 @@ export default function App() {
     const map = L.map(mapRef.current, { center: [-0.5, 37.0], zoom: 6, zoomControl: true, attributionControl: false })
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map)
     mapInstanceRef.current = map
-    setTimeout(() => doRender(), 200)
+    setTimeout(() => { map.invalidateSize(); doRender() }, 300)
   }, [loggedIn])
 
   useEffect(() => { if (mapInstanceRef.current) doRender() }, [crop, curMod, tick])
@@ -2732,7 +2738,7 @@ export default function App() {
     setAiInput('')
     setTimeout(() => {
       var cn={maize:'Mahindi',wheat:'Ngano',beans:'Maharagwe',sorghum:'Mtama'}[crop]
-      setAiMessages(prev => [...prev, {who:'bot',text:'\u{1F916} ShambaMap AI:\n\nKenya '+cn+' across '+D.length+' counties. Avg hybrid: '+Math.round(D.reduce((s,d)=>s+d.srr[crop],0)/D.length)+'%.\nUliza kuhusu kaunti maalum!'}])
+      setAiMessages(prev => [...prev, {who:'bot',text:'\u{1F916} AgriMap AI:\n\nKenya '+cn+' across '+D.length+' counties. Avg hybrid: '+Math.round(D.reduce((s,d)=>s+d.srr[crop],0)/D.length)+'%.\nUliza kuhusu kaunti maalum!'}])
     }, 800)
   }
 
@@ -2759,7 +2765,7 @@ export default function App() {
       <div className="login-box">
         <div className="lb-logo">
           <i>🌱</i>
-          <h2>Shamba<b>Map</b> Kenya</h2>
+          <h2>Agri<b>Map</b> Kenya</h2>
           <p>Agriculture Decision Intelligence Platform</p>
         </div>
         <label>Select your role</label>
@@ -2778,7 +2784,8 @@ export default function App() {
             {role:'ward',icon:'📋',name:'Ward Agri Officer',desc:'Ward-level operations'},
             {role:'kalro_r',icon:'🔬',name:'KALRO Researcher',desc:'Field research & advisory'},
             {role:'coop',icon:'👩‍🌾',name:'SACCO/Cooperative',desc:'Farmer cooperatives'},
-            {role:'farmer',icon:'👨‍🌾',name:'Farmer / Mkulima',desc:'My farm advisory'}
+            {role:'farmer',icon:'👨‍🌾',name:'Farmer / Mkulima',desc:'My farm advisory'},
+            {role:'foundation',icon:'🏛️',name:'Foundation',desc:'Strategy, investment & policy'}
           ].map(r=>(
             <div key={r.role} className={'lb-role'+(selectedRole===r.role?' active':'')} data-role={r.role} onClick={()=>setSelectedRole(r.role)}>
               <div className="ri">{r.icon}</div><div className="rn">{r.name}</div><div className="rd">{r.desc}</div>
@@ -2797,7 +2804,7 @@ export default function App() {
           </select>
         </div>
         {loginErr&&<div className="lb-error" id="loginError">Please enter your name</div>}
-        <button className="lb-btn" onClick={()=>{if(!nameInput.trim()){setLoginErr(true);return};setLoginErr(false);const role=ROLES[selectedRole];setCurrentUser({name:nameInput,role:selectedRole,roleName:role.name,abbr:role.abbr,district:distInput,color:role.color,bg:role.bg});setLoggedIn(true);if(distInput&&!['cs','ps_crops','ps_horti','ps_livestock','dir_soil','dir_pp','kalro','ksc'].includes(selectedRole))setTimeout(()=>handleSelDist(distInput),500)}}>Enter ShambaMap →</button>
+        <button className="lb-btn" onClick={()=>{if(!nameInput.trim()){setLoginErr(true);return};setLoginErr(false);const role=ROLES[selectedRole];setCurrentUser({name:nameInput,role:selectedRole,roleName:role.name,abbr:role.abbr,district:distInput,color:role.color,bg:role.bg});setLoggedIn(true);if(selectedRole==='foundation')setActivePage('stress');else setActivePage('map');if(distInput&&!['cs','ps_crops','ps_horti','ps_livestock','dir_soil','dir_pp','kalro','ksc','foundation'].includes(selectedRole))setTimeout(()=>handleSelDist(distInput),500)}}>Enter AgriMap →</button>
         <div className="lb-demo">or <a onClick={()=>{setCurrentUser({name:'Demo User',role:'cs',roleName:'Cabinet Secretary Agriculture',abbr:'CS',district:'',color:'#10b981',bg:'rgba(16,185,129,.1)'});setLoggedIn(true)}}>Quick demo login as Cabinet Secretary</a></div>
       </div>
     </div>)
@@ -2806,10 +2813,24 @@ export default function App() {
   return(<>
     {/* TOP NAV */}
     <div className="top">
-      <div className="logo"><i>🌱</i><span>Shamba<b>Map</b></span></div>
+      <div className="logo" onClick={()=>setActivePage(currentUser?.role==='foundation'?'stress':'map')} style={{cursor:'pointer'}}><i>🌱</i><span>Agri<b>Map</b></span></div>
       <span className="tag tag-g">Kenya</span>
       <span id="roleBadge" className="role-badge" style={{color:currentUser?.color||'var(--gn)',background:currentUser?.bg||'rgba(16,185,129,.1)'}}>{currentUser?.abbr||'CS'}</span>
-      <div className="mtabs">
+      <div className="ptabs" style={{display:'flex',gap:2,marginLeft:6}}>
+        {[
+          {id:'map',icon:'🗺️',name:'Map'},
+          {id:'stress',icon:'🛡️',name:'Strategy Stress-Tester'},
+          {id:'cascade',icon:'🌊',name:'Cascadence Flow'},
+          {id:'invest',icon:'💰',name:'Investment Tracker'},
+          {id:'policy',icon:'📜',name:'Policy Updates'}
+        ].filter(p=>{
+          if(p.id==='map') return currentUser?.role!=='foundation';
+          return currentUser?.role==='foundation';
+        }).map(p=>(
+          <button key={p.id} className={'pt'+(activePage===p.id?' pt-on':'')} onClick={()=>setActivePage(p.id)} style={{height:28,padding:'0 10px',font:'inherit',fontSize:9,fontWeight:700,border:'none',borderRadius:4,cursor:'pointer',background:activePage===p.id?'#059669':'transparent',color:activePage===p.id?'#fff':'var(--t3)',whiteSpace:'nowrap',transition:'.15s'}}>{p.icon} {p.name}</button>
+        ))}
+      </div>
+      <div className="mtabs" style={{display:activePage==='map'?'flex':'none'}}>
         <button className={'mt'+(curMod==='seed'?' on':'')} data-m="seed" onClick={()=>handleSetModule('seed')}>🌱 Seed Intel</button>
         <button className={'mt'+(curMod==='seedsys'?' on':'')} data-m="seedsys" onClick={()=>handleSetModule('seedsys')}>🧬 Seed System Score</button>
         <button className={'mt'+(curMod==='dvs'?' on':'')} data-m="dvs" onClick={()=>handleSetModule('dvs')}>🦠 Disease Surveillance</button>
@@ -2880,8 +2901,14 @@ export default function App() {
       </div>
     </div>
 
+    {/* PAGE VIEWS */}
+    {activePage==='stress' && <div className="wrap"><StressTester /></div>}
+    {activePage==='cascade' && <div className="wrap"><CascadenceFlow /></div>}
+    {activePage==='invest' && <div className="wrap"><InvestmentTracker /></div>}
+    {activePage==='policy' && <div className="wrap"><PolicyUpdates /></div>}
+
     {/* WRAP: sidebar + map + right panel */}
-    <div className="wrap">
+    <div className="wrap" style={{display:activePage==='map'?'flex':'none'}}>
       <div className="sl">
         <div className="sp"><div className="sh">Layers</div><div id="layers"></div></div>
         <div className="sp" style={{paddingBottom:'3px'}}><div className="sh" id="listTitle">Counties</div></div>
@@ -2895,7 +2922,7 @@ export default function App() {
         {aiOpen&&<div id="aiPanel" style={{position:'absolute',bottom:'70px',right:'16px',zIndex:800,width:'320px',maxHeight:'400px',background:'var(--s1)',border:'1px solid var(--bd)',borderRadius:'12px',boxShadow:'0 8px 32px rgba(0,0,0,.5)',overflow:'hidden'}}>
           <div style={{padding:'10px 12px',background:'var(--s2)',borderBottom:'1px solid var(--bd)',display:'flex',alignItems:'center',gap:'6px'}}>
             <span style={{fontSize:'16px'}}>🤖</span>
-            <div style={{flex:1}}><div style={{fontSize:'12px',fontWeight:700}}>ShambaMap AI</div><div style={{fontSize:'8px',color:'var(--gn)'}}>Ask in Swahili or English</div></div>
+            <div style={{flex:1}}><div style={{fontSize:'12px',fontWeight:700}}>AgriMap AI</div><div style={{fontSize:'8px',color:'var(--gn)'}}>Ask in Swahili or English</div></div>
             <span onClick={()=>setAiOpen(false)} style={{cursor:'pointer',color:'var(--t3)',fontSize:'14px'}}>✕</span>
           </div>
           <div id="aiMessages" style={{height:'260px',overflowY:'auto',padding:'8px',fontSize:'11px'}}>
