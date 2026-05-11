@@ -46,11 +46,21 @@ function simWeather(id){
 
 function simPest(id){var d=D.find(function(x){return x.id===id});var pests=[];var r=REAL[id];if(!r)return pests;
 if(r.maize.a>50000)pests.push({name:'Fall Armyworm (FAW)',risk:'HIGH',crop:'Maize',icon:'🐛',color:'var(--rd)',msg:'Scout weekly from emergence. Emamectin Benzoate 5SG. Push-pull IPM with Desmodium + Napier border.',trigger:'Early season + warm nights >18°C'});
-if(r.maize.a>50000 && (id==='bungoma'||id==='kakamega'||id==='kisumu'||id==='kisii'))pests.push({name:'Striga Witchweed',risk:'HIGH',crop:'Maize',icon:'🌿',color:'var(--rd)',msg:'CRITICAL in Western Kenya. Use Push-pull (Desmodium intercrop). IR Maize hybrids. Hand-pull before flowering.',trigger:'Degraded soils + continuous maize'});
-if(r.wheat.a>30000)pests.push({name:'Wheat Stem Rust (UG99)',risk:'HIGH',crop:'Wheat',icon:'🟤',color:'var(--rd)',msg:'CRITICAL: Spray Propiconazole 25EC if pustules seen. Use resistant varieties Eagle10/Korongo/Robin.',trigger:'Cool wet conditions + susceptible variety'});
+if(r.maize.a>20000 && (id==='bungoma'||id==='kakamega'||id==='kisumu'||id==='kisii'||id==='siaya'||id==='vihiga'||id==='busia'||id==='migori'||id==='homa_bay'))pests.push({name:'Striga Witchweed',risk:'HIGH',crop:'Maize',icon:'🌿',color:'var(--rd)',msg:'CRITICAL in Western Kenya. Use Push-pull (Desmodium intercrop). IR Maize hybrids. Hand-pull before flowering.',trigger:'Degraded soils + continuous maize'});
+if(r.wheat.a>30000)pests.push({name:'Wheat Stem Rust (UG99)',risk:'HIGH',crop:'Wheat',icon:'🟤',color:'var(--rd)',msg:'CRITICAL: Spray Propiconazole 25EC if pustules seen. Use resistant varieties: Eagle10, Korongo, Robin, Kenya Tembo, Kingbird.',trigger:'Cool wet conditions + susceptible variety'});
 if(d&&d.dr>=2)pests.push({name:'Locust/Armyworm',risk:'MEDIUM',crop:'All Crops',icon:'🦗',color:'var(--or)',msg:'Report swarms to KEPHIS hotline 0712-345-678. African Armyworm (Spodoptera) periodic outbreaks.',trigger:'Drought breaking rains in ASAL counties'});
 if(r.beans.a>15000)pests.push({name:'Bean Stem Maggot',risk:'MEDIUM',crop:'Beans',icon:'🪱',color:'var(--or)',msg:'Seed dressing with Imidacloprid. Earthing up at V3-V4 stage. Resistant varieties (KAT-B1).',trigger:'Late planting + warm temp'});
 if(r.beans.a>15000)pests.push({name:'Bean Common Mosaic Virus',risk:'LOW',crop:'Beans',icon:'🍃',color:'var(--gn)',msg:'Use certified seed (Nyota/Faida resistant). Rogue infected plants. Aphid control.',trigger:'Aphid vectors + susceptible variety'});
+// MLN — maize counties with area > 30k ha
+if(r.maize.a>30000)pests.push({name:'Maize Lethal Necrosis (MLN)',risk:'HIGH',crop:'Maize',icon:'🌾',color:'var(--rd)',msg:'CRITICAL: Remove & burn infected plants. Use MLN-tolerant hybrids: H629, H6213, PH04. Rotate with non-cereal crop.',trigger:'MCMV + SCMV co-infection, warm humid conditions'});
+// CBD — coffee counties (check CROPFIT)
+var cf=typeof CROPFIT!=="undefined"?CROPFIT[id]:null;
+if(cf&&cf.coffee)pests.push({name:'Coffee Berry Disease (CBD)',risk:'HIGH',crop:'Coffee',icon:'☕',color:'var(--rd)',msg:'Spray copper-based fungicide at flowering. Use resistant varieties: Ruiru 11, Batian (CRI-bred, CBD+CLR resistant).',trigger:'Wet flowering season + susceptible variety'});
+// CMD/CBSD — cassava counties (check CROPFIT)
+if(cf&&cf.cassava)pests.push({name:'Cassava Mosaic/Brown Streak (CMD/CBSD)',risk:'HIGH',crop:'Cassava',icon:'🥔',color:'var(--rd)',msg:'Use certified clean planting material. Resistant varieties: MM06/0083, Tajirika. Rogue infected plants. Control whitefly vectors.',trigger:'Whitefly vectors + susceptible variety'});
+// Striga expansion — extend to sorghum > 10k ha
+if(r.sorghum&&r.sorghum.a>10000)pests.push({name:'Striga Witchweed',risk:'MEDIUM',crop:'Sorghum',icon:'🌿',color:'var(--or)',msg:'Striga risk in sorghum fields. Use tolerant varieties (DK777, Gadam). Push-pull or hand-pull before flowering. Avoid continuous cereal.',trigger:'Degraded soils + continuous cereal cropping'});
+// UG99 expansion — add Kenya Tembo + Kingbird to msg
 return pests}
 
 // ══════ SOIL HELPERS ══════
@@ -614,7 +624,7 @@ function renderLegend(){
     phyto:'Phytosanitary Inspections',dfz:'Disease-Free Zone Progress',flagship:'BETA Flagship Investment',
     seedsys:'Seed System Score',
     smartcrop:'Top-fit Crop Score',
-    iovsoc:'Input-Output ROI',
+    iovsoc:'Subsidy Efficiency ROI',
     varrec:'Variety Recommendation Confidence',
     planrec:'Plan ROI'
   };
@@ -884,7 +894,7 @@ function renderDetail(){
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: KALRO, TRFK Kericho, Coffee Research Institute Ruiru, KTDA<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: Annual</div></div>';
   } else if(mod==='ksc'){
     var ksc=simKSC(d.id);
-    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(124,58,237,.15)">🏭</div><h3>KSC Distribution — '+cn+'<span class="cad-badge cad-ANNUAL" title="Kenya Seed Company variety register">Annual</span></h3></div>';
+    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(124,58,237,.15)">🏭</div><h3>KSC Distribution — '+cn+'<span class="cad-badge cad-ANNUAL" title="Kenya Seed Company variety register">Annual</span><span class="cad-badge cad-REF" style="margin-left:4px" title="County-level dispatch modelled from national dispatch + county cropped area + adoption rates">MODELLED</span></h3></div>';
     if(ksc){
       var fillPct=Math.round((ksc.distributed/ksc.demand)*100);
       html+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:3px"><span style="color:var(--t3)">Distribution Progress</span><span style="font-weight:700;color:'+(fillPct>=70?'var(--gn)':fillPct>=50?'var(--or)':'var(--rd)')+'">'+fillPct+'%</span></div>';
@@ -908,6 +918,7 @@ function renderDetail(){
       html+='</div>';
       html+='<div class="ic"><div class="ih" style="color:var(--pp)">📦 Computation</div>Crop area: '+ksc.area.toLocaleString()+' ha × Seed rate: '+ksc.seedRate+' kg/ha = <b>'+ksc.demand+' MT demand</b><br>Hybrid Adoption '+d.srr[c]+'% → <b>'+ksc.distributed+' MT distributed</b> as certified seed<br>Gap: <b style="color:var(--rd)">'+ksc.gap+' MT ('+ksc.gapPct+'%)</b> still on farm-saved seed</div>';
     }
+    html+='<div style="padding:4px 6px;background:rgba(245,158,11,0.06);border-radius:4px;border:1px solid rgba(245,158,11,0.3);font-size:8px;margin-bottom:4px;color:var(--or)">⚠ <b>MODELLED:</b> County-level dispatch is modelled from national KSC dispatch + county cropped area + hybrid adoption rates — not directly observed. For verified dispatch data, a partnership agreement with ADC/KSC would be needed.</div>';
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: KSC MIS | KEPHIS certification | Cooperative records<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: Annual</div></div>';
   } else if(mod==='sowing'){
     var sw=simSowing(d.id);
@@ -1050,7 +1061,7 @@ function renderDetail(){
     html+='<div style="padding:0 10px 8px;font-size:8px;color:var(--t3)">Source: MoALD field tracking + cooperative reports</div>';
     html+='<div style="margin-top:6px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: On-demand</div>';
   } else if(mod==='voice'){
-    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(192,38,211,.15)">🗣</div><h3>Mkulima Voice — '+d.n+'<span class="cad-badge cad-ANNUAL" title="Multilingual SMS/voice service">On-demand</span></h3></div>';
+    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(192,38,211,.15)">🗣</div><h3>Field Signal · Farmer Reports — '+d.n+'<span class="cad-badge cad-REF" title="Static per-query farmer reports">Static mockup</span></h3></div>';
     var regionVoices=FARMER_VOICES.filter(function(v){return v.dist===d.id});
     if(regionVoices.length===0){html+='<div style="color:var(--t3);font-size:11px">No recent farmer reports from '+d.n+'</div>';
     html+='<div style="margin-top:6px"><div class="sh">All Kenya — Recent</div>';
@@ -1058,7 +1069,7 @@ function renderDetail(){
     else{regionVoices.forEach(function(v){var sc5=v.severity==='red'?'var(--rd)':v.severity==='orange'?'var(--or)':'var(--gn)';html+='<div class="ic" style="border-left:3px solid '+sc5+'"><div style="display:flex;justify-content:space-between"><span class="ih">'+v.cat+'</span><span style="font-size:8px;color:'+sc5+'">'+v.count+' reports</span></div>'+v.msg+'</div>'});}
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: WhatsApp bot reports + USSD *741# advisory + sub-county extension officer field reports<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: On-demand</div></div>';
   } else if(mod==='pestcam'){
-    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(22,163,74,.15)">📸</div><h3>Pest Camera — Photo Diagnosis<span class="cad-badge cad-WEEKLY" title="Farmer photo capture, AI diagnosis">On-demand</span></h3></div>';
+    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(22,163,74,.15)">📸</div><h3>Pest Camera — Photo Diagnosis<span class="cad-badge cad-REF" title="UI mockup — not a working diagnostic tool">UI mockup</span></h3></div>';
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:8px">Mkulima sends leaf photo via WhatsApp — AI identifies pest/disease — returns treatment in Swahili/English</div>';
     html+='<div style="background:#111;border-radius:12px;overflow:hidden;border:2px solid var(--bd);margin-bottom:8px"><div style="height:140px;background:linear-gradient(135deg,#1a3a1a,#0a200a);display:flex;align-items:center;justify-content:center;flex-direction:column"><div style="width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px">📷</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:6px">Tap to capture leaf photo</div></div>';
     html+='<div style="padding:8px;text-align:center;font-size:9px;color:var(--gn)">🤖 AI ready — Fall Armyworm, UG99 Stem Rust, Striga, Bean Stem Maggot, CBD, Tea Mosquito Bug</div></div>';
@@ -1098,7 +1109,7 @@ function renderDetail(){
     html+='</div>'});
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: KNBS Statistical Abstract, KALRO seed data<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: Annual</div></div>';
   } else if(mod==='mkulima'){
-    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(37,211,102,.15)">📱</div><h3>Ushauri wa Mkulima — Farmer Advisory<span class="cad-badge cad-ANNUAL" title="Farmer-facing advisory">On-demand</span></h3></div>';
+    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(37,211,102,.15)">📱</div><h3>Mkulima Phone View · WhatsApp Mockup<span class="cad-badge cad-REF" title="Demo asset — WhatsApp-style advisory mockup">Demo asset</span></h3></div>';
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Personalized advisory for '+d.n+' farmers via WhatsApp in Swahili</div>';
     var recs2=getRecommendations(d.id);var topRec=recs2.length>0?recs2[0].variety:null;
     html+='<div style="padding:8px;background:#e8f5e9;border-radius:8px;border:1px solid #c8e6c9;margin-bottom:6px;font-size:10px;line-height:1.6">';
@@ -1317,7 +1328,7 @@ function renderDetail(){
     var nc=NCPB[d.id]||{depot:'N/A',capacity_bags:0,current_bags:0,stock_days:0,silos:0,role:'No depot'};
     var fillPct=nc.capacity_bags?Math.round(nc.current_bags/nc.capacity_bags*100):0;
     var sCol=nc.stock_days>=180?'var(--gn)':nc.stock_days>=90?'var(--or)':'var(--rd)';
-    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(34,197,94,.15)">🌾</div><h3>NCPB Strategic Reserves — '+d.n+'<span class="cad-badge cad-ANNUAL" title="NCPB capacity reports + monthly stocks (modelled)">Annual</span></h3></div>';
+    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(34,197,94,.15)">🌾</div><h3>NCPB Strategic Reserves — '+d.n+'<span class="cad-badge cad-MONTHLY" title="NCPB capacity reports + monthly stocks (modelled)">Monthly (modelled)</span></h3></div>';
     html+='<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg);border-radius:6px;border:1px solid var(--bd);margin-bottom:6px">';
     html+='<div style="font-size:32px;font-weight:900;color:'+sCol+'">'+nc.stock_days+'<span style="font-size:13px">d</span></div>';
     html+='<div style="flex:1"><div style="font-size:9px;color:var(--t3)">Stock days at current consumption</div>';
@@ -1327,7 +1338,8 @@ function renderDetail(){
     html+='<div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:2px"><span style="font-weight:700">Depot fill</span><span>'+nc.current_bags.toLocaleString()+' / '+nc.capacity_bags.toLocaleString()+' bags</span></div>';
     html+='<div style="height:8px;background:var(--s2);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+fillPct+'%;background:var(--gn)"></div></div>';
     html+='<div style="font-size:7px;color:var(--t3);margin-top:2px">'+fillPct+'% of capacity • '+nc.silos+' silo(s)</div></div>';
-    if(nc.stock_days<60&&nc.stock_days>0)html+='<div style="padding:5px;background:rgba(220,38,38,0.05);border-radius:5px;border:1px solid var(--rd);font-size:9px"><b>⚠ CRITICAL:</b> &lt;60 days = procurement urgent for ASAL relief</div>';
+    if(d.id==='nairobi')html+='<div style="padding:4px 6px;background:rgba(99,102,241,0.05);border-radius:4px;border:1px solid var(--pp);font-size:8px;margin-bottom:4px;color:var(--t2)">ℹ <b>Nairobi:</b> Low NCPB stock-days ('+nc.stock_days+'d) reflect consumer-market dynamics, not food insecurity. As a consumer hub, Nairobi draws from multiple supply chains beyond NCPB depots (private millers, imports, cross-county trade). IPC Phase 1 remains appropriate.</div>';
+    if(nc.stock_days<60&&nc.stock_days>0&&d.id!=='nairobi')html+='<div style="padding:5px;background:rgba(220,38,38,0.05);border-radius:5px;border:1px solid var(--rd);font-size:9px"><b>⚠ CRITICAL:</b> &lt;60 days = procurement urgent for ASAL relief</div>';
     else if(nc.stock_days<90&&nc.stock_days>0)html+='<div style="padding:5px;background:rgba(245,158,11,0.05);border-radius:5px;border:1px solid var(--or);font-size:9px"><b>⚡ Watch:</b> Consider replenishment ahead of next dry season</div>';
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: NCPB depot reports • National Strategic Reserve target: 6M bags<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: Monthly stocks (modelled), annual capacity</div></div>';
 
@@ -1378,6 +1390,7 @@ function renderDetail(){
   } else if(mod==='flagship'){
     var fl=FLAGSHIP[d.id]||{projects:[],galana_ha:0,galana_target_ha:0,nib_ha:0,investment_kshB:0};
     html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(124,58,237,.15)">🏛️</div><h3>Flagship Projects — '+d.n+'<span class="cad-badge cad-ANNUAL" title="PDU flagship project reports">Annual</span></h3></div>';
+    if(d.id==='tana_river')html+='<div style="padding:5px 8px;background:rgba(245,158,11,0.08);border-radius:5px;border:1px solid var(--or);font-size:9px;margin-bottom:6px;font-weight:600;color:var(--or)">📍 Phase 2 county — additional module data (crop, soil, weather, variety) in development. Flagship projects active.</div>';
     if(fl.projects.length===0){
       html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">';
       html+='No active national flagship projects in '+d.n+'.';
@@ -1402,6 +1415,8 @@ function renderDetail(){
         html+='<b>NIB irrigation:</b> '+fl.nib_ha.toLocaleString()+' ha developed</div>';
       }
     }
+    var bt=BETA[d.id]||{subsidy_kshM:0};
+    if(fl.investment_kshB>=2&&bt.subsidy_kshM<100)html+='<div style="padding:4px 6px;background:rgba(99,102,241,0.05);border-radius:4px;border:1px solid var(--pp);font-size:8px;margin-top:4px;color:var(--t2)">ℹ <b>High flagship + low subsidy:</b> Capital infrastructure (Galana-Kulalu irrigation, JKIA cold chain, CAIP construction) does not flow through farmer e-voucher subsidies. These are complementary investments, not contradictory — infrastructure takes years to translate into direct farmer subsidy flow.</div>';
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: BETA Flagship Tracker • National Irrigation Board • State Dept Crops monthly briefs<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: Annual</div></div>';
 
 
@@ -1575,6 +1590,7 @@ function renderDetail(){
     html+='<div style="font-size:30px;font-weight:900;color:'+sevCol+'">'+sa.acid_arable_pct+'%</div>';
     html+='<div style="flex:1"><div style="font-size:9px;color:var(--t3)">Arable land affected by acidity (pH<5.5)</div>';
     html+='<div style="font-size:11px;font-weight:700;color:'+sevCol+'">'+sa.severity+' acidification</div>';
+    if(sa.acid_crop_label)html+='<div style="font-size:10px;font-weight:600;color:var(--or);margin-top:2px">'+sa.acid_crop_label+'</div>';
     html+='<div style="font-size:9px;color:var(--t3)">National avg: 63% (KALRO 2023)</div></div></div>';
     // NAVCDP sampling progress
     html+='<div style="padding:6px;background:var(--bg);border-radius:5px;border:1px solid var(--bd);margin-bottom:6px">';
@@ -1595,6 +1611,7 @@ function renderDetail(){
     // Severity-specific recommendations
     if(sa.severity==='Severe'){
       html+='<div style="padding:6px;background:rgba(220,38,38,0.05);border-radius:5px;border:1px solid var(--rd);font-size:9px;margin-bottom:6px"><b>⚠ Action required:</b> Apply lime '+sa.lime_req_t_ha+' t/ha during dry season before next planting. Switch from urea/CAN to phosphate fertilizers. Per KALRO research, fertilizer effectiveness is reduced by up to 30% on acid soils — liming + matched phosphate can deliver up to 77% yield gain over 5 years (ASTGS Flagship #2).</div>';
+      if(sa.tolerant_crops&&sa.tolerant_crops.length)html+='<div style="padding:5px;background:rgba(245,158,11,0.06);border-radius:5px;border:1px solid var(--or);font-size:9px;margin-bottom:6px"><b>🌱 Crop tolerance note:</b> '+sa.acid_crop_label+'. These crops can still perform well at current pH levels — prioritise liming for cereal/legume plots first.</div>';
     } else if(sa.severity==='Moderate'){
       html+='<div style="padding:6px;background:rgba(245,158,11,0.05);border-radius:5px;border:1px solid var(--or);font-size:9px;margin-bottom:6px"><b>Watch:</b> Targeted liming on most-affected fields. Annual soil testing recommended for high-value plots.</div>';
     } else if(sa.severity==='Mild'||sa.severity==='Minimal'){
@@ -1833,7 +1850,7 @@ function renderDetail(){
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Decision-support synthesis: GAEZ v4 + iSDAsoil + SPI rainfall + VCI vegetation + KAMIS market + EUDR + buyer presence + dealer access. Indicative — final decisions need extension officer + farmer context.</div>';
     var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});
     if(!crops.length){
-      html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">No crop-fit data for '+d.n+'. Available for 25 priority counties.</div>';
+      html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">No crop-fit data for '+d.n+'.</div>';
     } else {
       // Build score per crop = 0.30*fit + 0.15*market + climate adjustment + regulatory + risk
       var scored=crops.map(function(cr){
@@ -1917,10 +1934,10 @@ function renderDetail(){
 
   } else if(mod==='iovsoc'){
     var io=IOVSOC[d.id];
-    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(99,102,241,.15)">📊</div><h3>Input vs Outcome — '+d.n+'<span class="cad-badge cad-ANNUAL" title="NCPB e-voucher + KAMIS price + KNBS yield + Tegemeo cost panels">Annual+Quarterly</span></h3></div>';
-    html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">County-level subsidy & input efficiency: KSh in vs KSh out. Anchored to NCPB e-voucher disbursement, KAMIS output prices, KNBS yield estimates, Tegemeo Institute farm-economics panels.</div>';
+    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(99,102,241,.15)">📊</div><h3>Subsidy Efficiency — '+d.n+'<span class="cad-badge cad-ANNUAL" title="NCPB e-voucher + KAMIS price + KNBS yield + Tegemeo cost panels">Annual+Quarterly</span></h3></div>';
+    html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">County-level subsidy &amp; input efficiency: KSh in vs KSh out. Anchored to NCPB e-voucher disbursement, KAMIS output prices, KNBS yield estimates, Tegemeo Institute farm-economics panels. <b>For full per-hectare/acre breakdown + Pula insurance, see Plan + Outcome.</b></div>';
     if(!io){
-      html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">No input-output data for '+d.n+'. Available for 25 priority counties.</div>';
+      html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">No input-output data for '+d.n+'.</div>';
     } else {
       var outputKshHa=Math.round(io.yield_tHa*io.price_kshT);
       var marginKshHa=outputKshHa-io.input_kshHa;
@@ -1994,6 +2011,7 @@ function renderDetail(){
       html+='<div style="padding:6px;background:rgba(245,158,11,0.05);border-radius:5px;border:1px solid var(--or);font-size:9px;margin-bottom:6px"><b>Insight:</b> '+insight+'</div>';
     }
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Sources: NCPB e-voucher disbursement (BETA fertilizer programme) · KNBS Crop Yield Estimates · KAMIS market prices · Tegemeo Institute Egerton farm-economics panels · Treasury QEBR · KIAMIS<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: Annual yield + Quarterly subsidy disbursement + Monthly KAMIS price</div></div>';
+    html+='<div style="margin-top:6px;padding:5px 8px;background:rgba(34,197,94,0.06);border-radius:5px;border:1px solid var(--gn);font-size:9px">🌾 <b>For variety selection →</b> See <b>Seed Variety Pick</b> module for KEPHIS-registered variety recommendations for the top crop above.</div>';
 
   } else if(mod==='varrec'){
     var cf=CROPFIT[d.id]||{};
@@ -2003,6 +2021,7 @@ function renderDetail(){
     var ss=d.seed||{};
     html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(34,197,94,.15)">🌾</div><h3>Seed Variety Pick — '+d.n+'<span class="cad-badge cad-ANNUAL" title="KEPHIS Variety Register + KALRO release records">Annual</span></h3></div>';
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Variety-level recommendations: KEPHIS Variety Register + KALRO release records + climate matching + variety age check + counterfeit risk. Confirm with extension officer + KALRO contact before scaling.</div>';
+    html+='<div style="padding:5px 8px;background:rgba(34,197,94,0.06);border-radius:5px;border:1px solid var(--gn);font-size:9px;margin-bottom:6px">🌱 Crop selection via <b>Crop Recommendation</b> module. Showing varieties for the top-fit crop below.</div>';
     var crops=Object.keys(cf).filter(function(c){return c!=='dairy'&&c!=='fish'&&c!=='beef'});
     if(!crops.length){
       html+='<div style="padding:12px;text-align:center;color:var(--t3);font-size:10px;background:var(--bg);border-radius:6px;border:1px solid var(--bd)">No crop-fit data for '+d.n+'.</div>';
@@ -2034,6 +2053,15 @@ function renderDetail(){
         if(v.yield)sc+=Math.round(v.yield/maxY*10);
         // SPI/drought penalty for non-drought-tolerant
         if(sp.spi_12<-1 && (v.traits||[]).join(' ').toLowerCase().indexOf('drought')<0)sc-=8;
+        // Pest-resistance boost: +10 when variety traits match active pests
+        var activePests=simPest(id);
+        var traitStr=(v.traits||[]).join(' ').toLowerCase();
+        activePests.forEach(function(p){
+          if(p.name.indexOf('CBD')>=0 && traitStr.indexOf('cbd')>=0)sc+=10;
+          if(p.name.indexOf('UG99')>=0 && (traitStr.indexOf('rust')>=0||traitStr.indexOf('ug99')>=0))sc+=10;
+          if(p.name.indexOf('MLN')>=0 && traitStr.indexOf('mln')>=0)sc+=10;
+          if(p.name.indexOf('CMD')>=0 && (traitStr.indexOf('cmd')>=0||traitStr.indexOf('mosaic')>=0))sc+=10;
+        });
         return {v:v,sc:sc,age:age};
       }).sort(function(a,b){return b.sc-a.sc});
       var top3=scored.slice(0,3);
@@ -2070,7 +2098,7 @@ function renderDetail(){
         if(sp.spi_12<-1)why.push('Drought (SPI '+sp.spi_12.toFixed(1)+') → preferred drought-tolerant traits');
         else if(sp.spi_12>1)why.push('Wet conditions (SPI +'+sp.spi_12.toFixed(1)+') → preferred high-yield varieties');
       }
-      if(sa.severity==='Severe')why.push('Soil acidity severe → noted for variety choice');
+      if(sa.severity==='Severe'){if(sa.tolerant_crops&&sa.tolerant_crops.indexOf(topCrop)>=0)why.push('Soil acidity severe but <b>'+topCrop+' is acid-tolerant</b> here');else why.push('Soil acidity severe → prefer acid-tolerant varieties');}
       why.push('Variety age weighted: KEPHIS recommends <10 years');
       if(why.length){
         html+='<div style="padding:6px;background:rgba(99,102,241,0.05);border-radius:5px;border:1px solid var(--pp);font-size:8px;margin-top:4px;line-height:1.6"><b>Why these picks:</b> '+why.join(' · ')+'</div>';
@@ -2239,7 +2267,7 @@ function renderDetail(){
     var hustlerScore=Math.min(100,b.hustler_M/10); // 1000M = 100
     var betaScore=Math.round(b.caip_pct*0.4+subsidyScore*0.3+pendingScore*0.2+hustlerScore*0.1);
     var bcol=betaScore>=70?'var(--gn)':betaScore>=50?'var(--or)':'var(--rd)';
-    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(245,158,11,.15)">🏗</div><h3>BETA Delivery Score — '+d.n+'<span class="cad-badge cad-MONTHLY" title="PDU BETA delivery review">Quarterly</span></h3></div>';
+    html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(245,158,11,.15)">🏗</div><h3>BETA Delivery Score — '+d.n+'<span class="cad-badge cad-MONTHLY" title="PDU BETA delivery review">Quarterly</span><span class="cad-badge cad-REF" style="margin-left:4px" title="Per-county subsidy & pending bills extrapolated from national totals">MODELLED</span></h3></div>';
     html+='<div style="display:flex;align-items:center;gap:8px;padding:8px;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(245,158,11,0.08));border-radius:6px;border:1px solid var(--bd);margin-bottom:6px">';
     html+='<div style="font-size:36px;font-weight:900;color:'+bcol+'">'+betaScore+'</div>';
     html+='<div style="flex:1"><div style="font-size:9px;color:var(--t3)">/100 BETA Pillar Delivery</div>';
@@ -2256,6 +2284,7 @@ function renderDetail(){
     html+='<div style="padding:5px;background:var(--bg);border-radius:5px;border:1px solid var(--bd)"><div style="font-size:7px;color:var(--t3)">Pending bills</div><div style="font-size:13px;font-weight:800;color:'+(b.pending_M>200?'var(--rd)':b.pending_M>100?'var(--or)':'var(--gn)')+'">KSh '+b.pending_M+'M</div><div style="font-size:7px;color:var(--t3)">Treasury risk</div></div>';
     html+='<div style="padding:5px;background:var(--bg);border-radius:5px;border:1px solid var(--bd)"><div style="font-size:7px;color:var(--t3)">Hustler Fund</div><div style="font-size:13px;font-weight:800;color:var(--bl)">KSh '+b.hustler_M+'M</div><div style="font-size:7px;color:var(--t3)">Disbursed</div></div>';
     html+='</div>';
+    html+='<div style="padding:4px 6px;background:rgba(245,158,11,0.06);border-radius:4px;border:1px solid rgba(245,158,11,0.3);font-size:8px;margin-bottom:4px;color:var(--or)">⚠ <b>MODELLED:</b> Per-county subsidy disbursement &amp; pending bills are extrapolated from national totals using county cropped area + registration share. CAIP locations &amp; status from PDU statements (real). Hustler Fund national total from CBK + FIF Board (real).</div>';
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: Treasury QEBR FY24/25 • State Dept Crops monthly briefs • CRA County Reports<div style="margin-top:3px;font-size:9px;color:#4f46e5;font-weight:600">◑ Refresh: Quarterly</div></div>';
 
   } else if(mod==='foodsec'){
@@ -2281,7 +2310,8 @@ function renderDetail(){
     html+='<div style="font-size:8px;color:var(--t3)">Stressed/crisis population</div>';
     html+='<div style="font-size:16px;font-weight:800;color:'+(f.stress_pop_pct>20?'var(--rd)':f.stress_pop_pct>10?'var(--or)':'var(--gn)')+'">'+f.stress_pop_pct+'% of pop</div></div>';
     var ndma=NDMA_PHASE[d.id];
-    if(ndma&&ndma!=='N/A')html+='<div style="font-size:9px;color:var(--t2);margin-top:4px"><b>NDMA drought phase:</b> '+ndma+'</div>';
+    if(ndma&&ndma.phase&&ndma.phase!=='N/A')html+='<div style="font-size:9px;color:var(--t2);margin-top:4px"><b>NDMA drought phase:</b> '+ndma.phase+' ('+ndma.trend+') — '+ndma.note+'</div>';
+    html+='<div style="padding:4px 6px;background:rgba(99,102,241,0.05);border-radius:4px;border:1px solid var(--pp);font-size:8px;margin-top:4px;line-height:1.5;color:var(--t2)">ℹ <b>Note:</b> Food CPI (price inflation) and IPC Phase (food-security classification) measure different things. High food CPI with low IPC can reflect market price pressure in otherwise food-secure counties — households cut back on meat/sugar but still access staples. These indicators are complementary, not contradictory.</div>';
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: KFSSG/SRA-LRA Reports • IPC Acute Food Insecurity • NCPB stocks • KAMIS volatility<div style="margin-top:3px;font-size:9px;color:#4f46e5;font-weight:600">◑ Refresh: Bi-annual + monthly NDMA</div></div>';
 
   } else if(mod==='eudr'){
@@ -2373,9 +2403,10 @@ function renderDetail(){
     html+='<div style="margin-top:6px;font-size:9px;color:var(--t3)">Source: Kenya Dairy Board (KDB) • State Dept Livestock • ANITRAC platform<div style="margin-top:3px;font-size:9px;color:#d97706;font-weight:600">○ Refresh: Quarterly</div></div>';
 
   } else if(mod==='league'){
-    // National League Table — rank all 25 counties on composite scores
+    // National League Table — rank all 47 counties on composite scores
     html+='<div class="sc"><div class="mp-title"><div class="mp-icon" style="background:rgba(234,88,12,.15)">🏆</div><h3>National League Table — Government Priority Scores<span class="cad-badge cad-REF" title="Multi-indicator ranking">Composite</span></h3></div>';
     html+='<div style="font-size:9px;color:var(--t3);margin-bottom:6px">Cabinet Secretary view • Ranked by composite delivery score</div>';
+    html+='<div style="padding:5px 8px;background:rgba(34,197,94,0.06);border-radius:5px;border:1px solid rgba(34,197,94,0.3);font-size:8px;margin-bottom:6px;color:var(--gn);line-height:1.5">📍 <b>All 47 counties covered.</b> Includes Northern ASAL (Turkana, Marsabit, Mandera, Wajir, Garissa, Isiolo, Samburu), Western Lake Basin, Rift Valley, and Coastal counties. ASAL counties use modelled estimates from NDMA + FEWS NET + county CIDPs.</div>';
     // Build composite per county
     var rows=D.map(function(dd){
       var k3=KIAMIS[dd.id]||{tot_hh:1,registered:0,evoucher_pct:0};
@@ -2487,7 +2518,7 @@ function askAI(){var inp=document.getElementById('aiInput');var q=inp.value.trim
 
 // ══════ AUTH SYSTEM ══════
 var ROLES={
-  cs:{name:'Cabinet Secretary Agriculture',abbr:'CS',color:'#10b981',bg:'rgba(16,185,129,.1)',modules:['league','beta','foodsec','kiamis','eudr','dairy','dvs','exports','coldchain','mech','ncpb','phyto','dfz','flagship','dealers','smartcrop','iovsoc','varrec','planrec','smartcrop','iovsoc','varrec','planrec','cpi','hustler','gfw','acid','cropfit','vci','spi','tea','coffee','pestwatch','seed','seedsys','dss','ndvi','weather','pest','fertilizer','market','horti','credit','officer','ksc','sowing','yieldloss','earlywarning','benchmark','monsoon','report','voice','seedqr','kenat'],desc:'Full national access'},
+  cs:{name:'Cabinet Secretary Agriculture',abbr:'CS',color:'#10b981',bg:'rgba(16,185,129,.1)',modules:['league','beta','foodsec','kiamis','eudr','dairy','dvs','exports','coldchain','mech','ncpb','phyto','dfz','flagship','dealers','smartcrop','iovsoc','varrec','planrec','cpi','hustler','gfw','acid','cropfit','vci','spi','tea','coffee','pestwatch','seed','seedsys','dss','ndvi','weather','pest','fertilizer','market','horti','credit','officer','ksc','sowing','yieldloss','earlywarning','benchmark','monsoon','report','voice','seedqr','kenat'],desc:'Full national access'},
   ps_crops:{name:'PS Agriculture',abbr:'PSA',color:'#059669',bg:'rgba(5,150,105,.1)',modules:['league','beta','foodsec','kiamis','ncpb','mech','flagship','dealers','smartcrop','iovsoc','varrec','planrec','seed','seedsys','cpi','hustler','dss','voice','kenat','ndvi','sowing','yieldloss','earlywarning','benchmark','monsoon','officer','ksc','report'],desc:'State Department for Agriculture'},
   ps_horti:{name:'AFA Director Horticulture',abbr:'DH',color:'#a855f7',bg:'rgba(168,85,247,.1)',modules:['horti','exports','coldchain','phyto','market','weather','pest','sowing','eudr','gfw','tea','coffee','pestwatch','vci','spi','report'],desc:'Horticultural Crops Directorate (AFA)'},
   ps_livestock:{name:'PS Livestock Development',abbr:'PSL',color:'#0891b2',bg:'rgba(8,145,178,.1)',modules:['dairy','dvs','dfz','league','foodsec','beta','market','weather','flagship','report'],desc:'State Department for Livestock'},
@@ -2843,7 +2874,7 @@ export default function App() {
         <button className={'mt'+(curMod==='flagship'?' on':'')} data-m="flagship" onClick={()=>handleSetModule('flagship')}>🏛️ Flagship Projects</button>
         <button className={'mt'+(curMod==='dealers'?' on':'')} data-m="dealers" onClick={()=>handleSetModule('dealers')}>🏪 Agro-Dealer Network</button>
         <button className={'mt'+(curMod==='smartcrop'?' on':'')} data-m="smartcrop" onClick={()=>handleSetModule('smartcrop')}>🌱 Crop Recommendation</button>
-        <button className={'mt'+(curMod==='iovsoc'?' on':'')} data-m="iovsoc" onClick={()=>handleSetModule('iovsoc')}>📊 Input vs Outcome</button>
+        <button className={'mt'+(curMod==='iovsoc'?' on':'')} data-m="iovsoc" onClick={()=>handleSetModule('iovsoc')}>📊 Subsidy Efficiency</button>
         <button className={'mt'+(curMod==='varrec'?' on':'')} data-m="varrec" onClick={()=>handleSetModule('varrec')}>🌾 Seed Variety Pick</button>
         <button className={'mt'+(curMod==='planrec'?' on':'')} data-m="planrec" onClick={()=>handleSetModule('planrec')}>📋 Plan + Outcome</button>
         <button className={'mt'+(curMod==='cpi'?' on':'')} data-m="cpi" onClick={()=>handleSetModule('cpi')}>🛒 Food CPI</button>
@@ -2872,8 +2903,8 @@ export default function App() {
         <button className={'mt'+(curMod==='monsoon'?' on':'')} data-m="monsoon" onClick={()=>handleSetModule('monsoon')}>🌧 Season Ready</button>
         <button className={'mt'+(curMod==='dss'?' on':'')} data-m="dss" onClick={()=>handleSetModule('dss')}>📋 Scheme Tracker</button>
         <button className={'mt'+(curMod==='report'?' on':'')} data-m="report" onClick={()=>handleSetModule('report')}>📄 Report</button>
-        <button className={'mt'+(curMod==='mkulima'?' on':'')} data-m="mkulima" onClick={()=>handleSetModule('mkulima')}>📱 Ushauri wa Mkulima</button>
-        <button className={'mt'+(curMod==='voice'?' on':'')} data-m="voice" onClick={()=>handleSetModule('voice')}>🗣 Farmer Voice</button>
+        <button className={'mt'+(curMod==='mkulima'?' on':'')} data-m="mkulima" onClick={()=>handleSetModule('mkulima')}>📱 Mkulima Phone View</button>
+        <button className={'mt'+(curMod==='voice'?' on':'')} data-m="voice" onClick={()=>handleSetModule('voice')}>🗣 Field Signal</button>
         <button className={'mt'+(curMod==='pestcam'?' on':'')} data-m="pestcam" onClick={()=>handleSetModule('pestcam')}>📸 Pest Camera</button>
         <button className={'mt'+(curMod==='seedqr'?' on':'')} data-m="seedqr" onClick={()=>handleSetModule('seedqr')}>📎 Seed QR</button>
         <button className={'mt'+(curMod==='kiamis'?' on':'')} data-m="kiamis" onClick={()=>handleSetModule('kiamis')}>🪪 KIAMIS Coverage</button>
@@ -2960,7 +2991,7 @@ export default function App() {
         <div style={{padding:'12px',background:'rgba(8,145,178,.06)',border:'1px solid rgba(8,145,178,.2)',borderRadius:'8px',marginBottom:'12px'}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
             <div style={{fontSize:'13px',fontWeight:700}}>📈 KAMIS Market Prices</div>
-            <span style={{fontSize:'9px',fontWeight:800,padding:'2px 8px',borderRadius:'3px',color:'#10b981',background:'rgba(16,185,129,.15)'}}>🟢 25 counties wired</span>
+            <span style={{fontSize:'9px',fontWeight:800,padding:'2px 8px',borderRadius:'3px',color:'#f59e0b',background:'rgba(245,158,11,.12)'}}>📍 All 47 counties</span>
           </div>
           <div style={{fontSize:'10px',color:'var(--t3)',marginTop:'5px'}}>Real wholesale prices for maize, beans, sorghum, wheat per market — sourced from KAMIS via MoALD bulletins.</div>
         </div>

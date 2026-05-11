@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:vectorstone.in)",
+      "Bash(npx vite:*)",
+      "Bash(sed 's/:.*//')",
+      "Bash(xargs -I {} sed -n '{}p' /c/Users/adity/Downloads/shambamap/shambamap-react/src/data/index.js)",
+      "Bash(sed 's/=.*//')",
+      "Bash(sed 's/export const //')",
+      "Bash(xargs grep:*)",
+      "Bash(grep -n \"cadence\\\\|badge\\\\|refresh\\\\|MODELLED\" /c/Users/adity/Downloads/shambamap/shambamap-react/src/pages/*.jsx)",
+      "WebSearch",
+      "WebFetch(domain:victormatara.com)",
+      "WebFetch(domain:agri-experience.com)",
+      "WebFetch(domain:jua-kenya.com)",
+      "WebFetch(domain:abiri.home.blog)",
+      "WebFetch(domain:www.ipcinfo.org)",
+      "WebFetch(domain:lamu.go.ke)",
+      "Read(//c/Users/adity/.claude/projects/c--Users-adity-Downloads-shambamap/de959679-68bf-410d-ba8e-57d6463daeea/subagents/**)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:simplemaps.com)",
+      "Bash(gh api:*)",
+      "Bash(python -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(f[''''name'''']\\) for f in data[:10]]\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''default_branch'''',''''unknown''''\\)\\)\")",
+      "Bash(python -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(d[''''name'''']\\) for d in data]\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/Mondieki/kenya-counties-subcounties/master/geojson/kajiado.json\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/Mondieki/kenya-counties-subcounties/master/geojson/nandi.json\")",
+      "Bash(node /tmp/convert_geo.js)",
+      "Bash(node /tmp/build_nc_geo.js)",
+      "Bash(sed \"s|''''/tmp/nc_geo_block.txt''''|require\\(''''path''''\\).join\\(require\\(''''os''''\\).tmpdir\\(\\), ''''nc_geo_block.txt''''\\)|\")",
+      "Bash(node /tmp/build_nc_geo2.js)"
+    ]
+  }
+}
