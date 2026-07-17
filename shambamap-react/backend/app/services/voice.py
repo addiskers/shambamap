@@ -3,7 +3,7 @@ import base64
 from google import genai
 from google.genai import types
 from app.config import get_settings
-from app.prompts.swahili_system import SYSTEM_PROMPT
+from app.prompts.voice_system import SYSTEM_PROMPT
 
 settings = get_settings()
 
